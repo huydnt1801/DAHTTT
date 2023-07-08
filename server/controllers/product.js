@@ -1,6 +1,4 @@
-import mongoose from "mongoose";
 import Product from "../models/product.js";
-import Shop from "../models/shop.js";
 import Cart from "../models/cart.js";
 import User from "../models/user.js";
 
@@ -9,6 +7,7 @@ export async function getProducts(req, res) {
     const products = await Product.find();
     return res.status(200).json(products);
   } catch (err) {
+    console.log(err);
     return res.status(500).json(err);
   }
 }
@@ -39,17 +38,13 @@ export async function addProduct(req, res) {
       price: price,
       description: description,
       imageUrl: imageUrl,
+      sellerId: userId,
     });
     await product.save();
 
-    const shop = new Shop({
-      userId: mongoose.Types.ObjectId(userId),
-      productId: product._id,
-    });
-    await shop.save();
-
-    return res.status(201).json("Thêm thành công");
+    return res.status(201).json("Thêm sản phẩm thành công");
   } catch (err) {
+    console.log(err);
     return res.status(500).json(err);
   }
 }
@@ -75,12 +70,7 @@ export async function editProduct(req, res) {
     const product = await Product.findOne({ _id: productId });
     if (!product) return res.status(404).json("Không tìm thấy sản phẩm");
 
-    const userId = req.userId;
-    var checkShop = await Shop.findOne({
-      userId: userId,
-      productId: productId,
-    });
-    if (!checkShop)
+    if (req.userId != product.sellerId)
       return res.status(403).json("Bạn không có quyền chỉnh sửa sản phẩm");
 
     product.title = title;
@@ -89,8 +79,9 @@ export async function editProduct(req, res) {
     product.description = description;
     await product.save();
 
-    return res.status(201).json("Sửa thành công");
+    return res.status(201).json("Sửa sản phẩm thành công");
   } catch (err) {
+    console.log(err);
     return res.status(500).json(err);
   }
 }
@@ -98,21 +89,18 @@ export async function editProduct(req, res) {
 export async function deleteProduct(req, res) {
   try {
     const productId = req.params.productId;
+    const product = await Product.findOne({ _id: productId });
+    if (!product) return res.status(404).json("Không tìm thấy sản phẩm");
 
-    const userId = req.userId;
-    var checkShop = await Shop.findOne({
-      userId: userId,
-      productId: productId,
-    });
-    if (!checkShop)
+    if (req.userId != product.sellerId)
       return res.status(403).json("Bạn không có quyền xóa sản phẩm");
 
-    await Shop.deleteMany({ productId: productId });
     await Cart.deleteMany({ productId: productId });
     await Product.deleteOne({ _id: productId });
 
-    return res.status(201).json("Xóa thành công");
+    return res.status(201).json("Xóa sản phẩm thành công");
   } catch (err) {
+    console.log(err);
     return res.status(500).json(err);
   }
 }

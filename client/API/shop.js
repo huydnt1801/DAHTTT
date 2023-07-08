@@ -16,8 +16,10 @@ export const productsApi = (sellerId, token) =>
 
 export const acceptDeliApi = (orderItemId, token) =>
   axios.put(
-    `${process.env.API_URL}/shop/${orderItemId}/accept`,
-    {},
+    `${process.env.API_URL}/shop/${orderItemId}/status`,
+    {
+      status: 1,
+    },
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -27,8 +29,10 @@ export const acceptDeliApi = (orderItemId, token) =>
 
 export const declineDeliApi = (orderItemId, token) =>
   axios.put(
-    `${process.env.API_URL}/shop/${orderItemId}/decline`,
-    {},
+    `${process.env.API_URL}/shop/${orderItemId}/status`,
+    {
+      status: 2,
+    },
     {
       headers: {
         Authorization: `Bearer ${token}`,

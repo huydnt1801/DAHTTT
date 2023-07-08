@@ -30,11 +30,13 @@ export async function login(req, res) {
 
     if (!user.verify) return res.status(400).json("Tài khoản chưa xác nhận");
     const token = jwt.sign({ id: user._id }, sceret);
-    user.token = token;
     await user.save();
     user.password = undefined;
-    return res.status(200).json(user);
+    const clonedUser = JSON.parse(JSON.stringify(user));
+    clonedUser.token = token;
+    return res.status(200).json(clonedUser);
   } catch (err) {
+    console.log(err);
     return res.status(500).json(err);
   }
 }
@@ -43,6 +45,7 @@ export async function logout(req, res) {
   try {
     return res.status(200).json({ token: null });
   } catch (error) {
+    console.log(err);
     return res.status(500).json(error);
   }
 }
@@ -78,6 +81,7 @@ export async function register(req, res) {
     sendVerifyAcc(newUser._id, email);
     return res.status(200).json("Đăng ký thành công");
   } catch (err) {
+    console.log(err);
     return res.status(500).json(err);
   }
 }
@@ -104,6 +108,7 @@ export async function editProfile(req, res) {
     user.password = undefined;
     return res.status(201).json(user);
   } catch (err) {
+    console.log(err);
     req.status(500).json(err);
   }
 }
@@ -136,6 +141,7 @@ export async function forgotPassword(req, res) {
     sendResetPass(email, newPass);
     return res.status(201).json("Vui lòng kiểm tra email của bạn");
   } catch (err) {
+    console.log(err);
     return res.status(500).json(err);
   }
 }
@@ -162,6 +168,7 @@ export async function changePassword(req, res) {
 
     return res.status(201).json("Đổi mật khẩu thành công");
   } catch (err) {
+    console.log(err);
     return res.status(500).json(err);
   }
 }
@@ -176,6 +183,7 @@ export async function verifyAcc(req, res) {
     user.save();
     return res.redirect("http://localhost:3000/login");
   } catch (err) {
+    console.log(err);
     return res.status(500).json(err);
   }
 }
@@ -187,8 +195,11 @@ export async function accInfo(req, res) {
     if (!user) return res.status(404).json("Không tìm thấy tài khoản");
 
     user.password = undefined;
-    return res.status(200).json(user);
+    const clonedUser = JSON.parse(JSON.stringify(user));
+    clonedUser.token = req.token;
+    return res.status(200).json(clonedUser);
   } catch (err) {
+    console.log(err);
     return res.status(500).json(err);
   }
 }

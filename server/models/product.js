@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
-const { Schema, model }  = mongoose;
+import mongoose from "mongoose";
+const { Schema, model } = mongoose;
 
 const productSchema = new Schema({
   title: {
@@ -17,6 +17,10 @@ const productSchema = new Schema({
   imageUrl: {
     type: String,
     required: true,
+  },
+  sellerId: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
   },
 });
 

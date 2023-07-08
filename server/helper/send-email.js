@@ -1,5 +1,5 @@
 import Mailjet from "node-mailjet";
-import { mailjetAPIKey, mailjetSecretKey } from "../config";
+import { mailjetAPIKey, mailjetSecretKey } from "../config.js";
 const mailjet = Mailjet.apiConnect(
   mailjetAPIKey,
   mailjetSecretKey
